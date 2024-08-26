@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PNG动画生成GIF</title>
+    <style>
+      #image-container {
+        display: none;
+        margin-top: 20px;
+      }
+      @keyframes scaleAnimation {
+        0% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(0.8);
+        }
+        100% {
+          transform: scale(1);
+        }
+      }
+      #animated-image {
+        animation: scaleAnimation 1s infinite;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>PNG动画生成GIF</h1>
+    <input type="file" id="file-input" accept="image/png" />
+    <div id="image-container">
+      <img id="animated-image" src="" alt="Selected Image" />
+    </div>
+    <button id="generate-gif" style="display: none">生成GIF</button>
+
+    <!-- 引入 gif.js 库 -->
+    <script src="js/gif.js"></script>
+    <script src="script.js"></script>
+  </body>
+</html>
