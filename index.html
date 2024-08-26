@@ -9,19 +9,9 @@
         display: none;
         margin-top: 20px;
       }
-      @keyframes scaleAnimation {
-        0% {
-          transform: scale(1);
-        }
-        50% {
-          transform: scale(0.8);
-        }
-        100% {
-          transform: scale(1);
-        }
-      }
       #animated-image {
-        animation: scaleAnimation 1s infinite;
+        display: block;
+        margin: 0 auto;
       }
     </style>
   </head>
@@ -31,7 +21,50 @@
     <div id="image-container">
       <img id="animated-image" src="" alt="Selected Image" />
     </div>
-    <button id="generate-gif" style="display: none">生成GIF</button>
+
+    <div id="controls" style="display: none">
+      <label for="min-scale">最小缩放比例:</label>
+      <input
+        type="number"
+        id="min-scale"
+        value="0.8"
+        step="0.1"
+        min="0.1"
+        max="1"
+      /><br /><br />
+
+      <label for="max-scale">最大缩放比例:</label>
+      <input
+        type="number"
+        id="max-scale"
+        value="1"
+        step="0.1"
+        min="0.1"
+        max="2"
+      /><br /><br />
+
+      <label for="frame-count">帧数:</label>
+      <input
+        type="number"
+        id="frame-count"
+        value="10"
+        step="1"
+        min="2"
+        max="60"
+      /><br /><br />
+
+      <label for="duration">时长 (秒):</label>
+      <input
+        type="number"
+        id="duration"
+        value="1"
+        step="0.1"
+        min="0.1"
+        max="10"
+      /><br /><br />
+
+      <button id="generate-gif">生成GIF</button>
+    </div>
 
     <!-- 引入 gif.js 库 -->
     <script src="js/gif.js"></script>

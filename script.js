@@ -2,6 +2,14 @@ document
   .getElementById("file-input")
   .addEventListener("change", handleFileSelect);
 
+// 监听参数变化
+document.getElementById("min-scale").addEventListener("input", updatePreview);
+document.getElementById("max-scale").addEventListener("input", updatePreview);
+document.getElementById("frame-count").addEventListener("input", updatePreview);
+document.getElementById("duration").addEventListener("input", updatePreview);
+
+let animationFrameId;
+
 function handleFileSelect(event) {
   const file = event.target.files[0];
   if (file && file.type === "image/png") {
@@ -10,7 +18,8 @@ function handleFileSelect(event) {
       const imgElement = document.getElementById("animated-image");
       imgElement.src = e.target.result;
       document.getElementById("image-container").style.display = "block";
-      document.getElementById("generate-gif").style.display = "block";
+      document.getElementById("controls").style.display = "block";
+      updatePreview(); // 更新预览
     };
     reader.readAsDataURL(file);
   } else {
@@ -18,10 +27,57 @@ function handleFileSelect(event) {
   }
 }
 
+function updatePreview() {
+  const imgElement = document.getElementById("animated-image");
+  const minScale = parseFloat(document.getElementById("min-scale").value);
+  const maxScale = parseFloat(document.getElementById("max-scale").value);
+  const frameCount = parseInt(document.getElementById("frame-count").value, 10);
+  const duration = parseFloat(document.getElementById("duration").value);
+
+  const delay = (duration * 1000) / frameCount; // 计算每帧的延迟时间（毫秒）
+
+  let startTime = null;
+
+  // 取消之前的动画帧（如果有）
+  if (animationFrameId) {
+    cancelAnimationFrame(animationFrameId);
+  }
+
+  function animate(time) {
+    if (!startTime) startTime = time;
+    const elapsed = time - startTime;
+
+    // 计算当前帧的索引
+    const frameIndex = Math.floor((elapsed / delay) % frameCount);
+
+    // 计算当前帧的缩放比例
+    const scale =
+      minScale +
+      (maxScale - minScale) *
+        Math.sin((frameIndex / (frameCount - 1)) * Math.PI);
+
+    // 应用缩放效果
+    imgElement.style.transform = `scale(${scale})`;
+
+    // 请求下一帧
+    animationFrameId = requestAnimationFrame(animate);
+  }
+
+  // 启动动画
+  animationFrameId = requestAnimationFrame(animate);
+}
+
 document.getElementById("generate-gif").addEventListener("click", generateGIF);
 
 function generateGIF() {
   const imgElement = document.getElementById("animated-image");
+  const minScale = parseFloat(document.getElementById("min-scale").value);
+  const maxScale = parseFloat(document.getElementById("max-scale").value);
+  const frameCount = parseInt(document.getElementById("frame-count").value, 10);
+  const duration = parseFloat(document.getElementById("duration").value);
+
+  const delay = (duration * 1000) / frameCount; // 计算每帧的延迟时间（毫秒）
+
   const gif = new GIF({
     workers: 2,
     quality: 10,
@@ -35,9 +91,11 @@ function generateGIF() {
   // 创建一个 canvas
   const { canvas, ctx } = createCanvas(width, height);
 
-  // 添加帧到 GIF
-  const scales = [1, 0.8, 1]; // 不同的缩放比例
-  scales.forEach((scale) => {
+  // 生成帧，并添加到 GIF
+  for (let i = 0; i < frameCount; i++) {
+    const scale =
+      minScale +
+      (maxScale - minScale) * Math.sin((i / (frameCount - 1)) * Math.PI);
     ctx.clearRect(0, 0, width, height); // 清除之前的内容
 
     // 将原点移动到图片中心
@@ -49,8 +107,8 @@ function generateGIF() {
     ctx.drawImage(imgElement, -width / 2, -height / 2, width, height);
     ctx.restore();
 
-    gif.addFrame(canvas, { copy: true, delay: 500 }); // 添加帧，延迟 0.5 秒
-  });
+    gif.addFrame(canvas, { copy: true, delay: delay }); // 添加帧，使用用户指定的延迟时间
+  }
 
   gif.on("finished", function (blob) {
     const file = document.getElementById("file-input").files[0];
