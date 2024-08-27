@@ -1,9 +1,0 @@
-{
-  "name": "make-gif",
-  "version": "1.0.0",
-  "main": "script.js",
-  "scripts": {
-    "start": "node script.js"
-  },
-  "bin": "script.js"
-}
