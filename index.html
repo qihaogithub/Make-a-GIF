@@ -5,64 +5,139 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>PNG动画生成GIF</title>
     <style>
-      #image-container {
+      body {
+        font-family: Arial, sans-serif;
+        line-height: 1.6;
+        color: #333;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #f4f4f4;
+      }
+      h1 {
+        text-align: center;
+        color: #2c3e50;
+      }
+      #file-input {
         display: none;
+      }
+      .file-input-container {
+        text-align: center;
         margin-top: 20px;
       }
+      .file-input-label {
+        display: inline-block;
+        padding: 10px 20px;
+        background-color: #3498db;
+        color: white;
+        cursor: pointer;
+        border-radius: 5px;
+        transition: background-color 0.3s;
+      }
+      .file-input-label:hover {
+        background-color: #2980b9;
+      }
+      #image-container {
+        margin-top: 20px;
+        text-align: center;
+      }
       #animated-image {
+        max-width: 100%;
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+      #controls {
+        background-color: white;
+        padding: 20px;
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        margin-top: 20px;
+      }
+      label {
+        display: inline-block;
+        width: 150px;
+        margin-bottom: 10px;
+      }
+      input[type="number"] {
+        width: 100px;
+        padding: 5px;
+        border: 1px solid #ddd;
+        border-radius: 3px;
+      }
+      #generate-gif {
         display: block;
-        margin: 0 auto;
+        width: 100%;
+        padding: 10px;
+        background-color: #2ecc71;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        margin-top: 20px;
+        transition: background-color 0.3s;
+      }
+      #generate-gif:hover {
+        background-color: #27ae60;
       }
     </style>
   </head>
   <body>
     <h1>PNG动画生成GIF</h1>
-    <input type="file" id="file-input" accept="image/png" />
-    <div id="image-container">
+    <div class="file-input-container">
+      <label for="file-input" class="file-input-label">选择PNG图片</label>
+      <input type="file" id="file-input" accept="image/png" />
+    </div>
+
+    <div id="image-container" style="display: none">
       <img id="animated-image" alt="Selected Image" />
     </div>
 
     <div id="controls" style="display: none">
-      <label for="min-scale">最小缩放比例:</label>
-      <input
-        type="number"
-        id="min-scale"
-        value="0.8"
-        step="0.1"
-        min="0.1"
-        max="1"
-      /><br /><br />
-
-      <label for="max-scale">最大缩放比例:</label>
-      <input
-        type="number"
-        id="max-scale"
-        value="1"
-        step="0.1"
-        min="0.1"
-        max="2"
-      /><br /><br />
-
-      <label for="frame-count">帧数:</label>
-      <input
-        type="number"
-        id="frame-count"
-        value="10"
-        step="1"
-        min="2"
-        max="60"
-      /><br /><br />
-
-      <label for="duration">时长 (秒):</label>
-      <input
-        type="number"
-        id="duration"
-        value="1"
-        step="0.1"
-        min="0.1"
-        max="10"
-      /><br /><br />
-
+      <div>
+        <label for="min-scale">最小缩放比例:</label>
+        <input
+          type="number"
+          id="min-scale"
+          value="0.8"
+          step="0.1"
+          min="0.1"
+          max="1"
+        />
+      </div>
+      <div>
+        <label for="max-scale">最大缩放比例:</label>
+        <input
+          type="number"
+          id="max-scale"
+          value="1"
+          step="0.1"
+          min="0.1"
+          max="2"
+        />
+      </div>
+      <div>
+        <label for="frame-count">帧数:</label>
+        <input
+          type="number"
+          id="frame-count"
+          value="10"
+          step="1"
+          min="2"
+          max="60"
+        />
+      </div>
+      <div>
+        <label for="duration">时长 (秒):</label>
+        <input
+          type="number"
+          id="duration"
+          value="1"
+          step="0.1"
+          min="0.1"
+          max="10"
+        />
+      </div>
       <button id="generate-gif">生成GIF</button>
     </div>
 
