@@ -91,12 +91,8 @@ document.getElementById("generate-gif").addEventListener("click", generateGIF);
 
 function generateGIF() {
   console.log("generateGIF function called");
-  console.log("按钮元素:", document.getElementById("generate-gif"));
-  console.log("图片元素:", document.getElementById("animated-image"));
-
   const imgElement = document.getElementById("animated-image");
 
-  // 检查图片是否已加载
   if (!imgElement.complete || !imgElement.naturalWidth) {
     alert("请等待图片完全加载后再生成GIF。");
     return;
@@ -111,18 +107,24 @@ function generateGIF() {
   console.log("GIF参数:", { minScale, maxScale, frameCount, duration, delay });
 
   const gif = new GIF({
-    workers: 2,
-    quality: 10,
+    workers: 4,
+    quality: 1,
     width: imgElement.naturalWidth,
     height: imgElement.naturalHeight,
-    transparent: "rgba(0,0,0,0)", // 设置透明背景
-    workerScript: "js/gif.worker.js", // 确保这个路径是正确的
+    transparent: "rgba(0,0,0,0)",
+    workerScript: "js/gif.worker.js",
+    dither: false,
   });
 
   const canvas = document.createElement("canvas");
   canvas.width = imgElement.naturalWidth;
   canvas.height = imgElement.naturalHeight;
-  const ctx = canvas.getContext("2d", { willReadFrequently: true });
+  const ctx = canvas.getContext("2d", {
+    willReadFrequently: true,
+    alpha: true,
+  });
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = "high";
 
   for (let i = 0; i < frameCount; i++) {
     const progress = i / (frameCount - 1);
@@ -136,7 +138,7 @@ function generateGIF() {
     const x = (canvas.width - scaledWidth) / 2;
     const y = (canvas.height - scaledHeight) / 2;
 
-    ctx.drawImage(imgElement, x, y, scaledWidth, scaledHeight);
+    drawImageWithQuality(ctx, imgElement, x, y, scaledWidth, scaledHeight);
 
     gif.addFrame(ctx, { copy: true, delay: delay });
     console.log(`添加第 ${i + 1} 帧`);
@@ -163,11 +165,39 @@ function generateGIF() {
   gif.render();
 }
 
-function createCanvas(width, height) {
-  const canvas = document.createElement("canvas");
-  canvas.width = width;
-  canvas.height = height;
-  const ctx = canvas.getContext("2d", { willReadFrequently: true });
-  ctx.clearRect(0, 0, width, height); // 确保画布是透明的
-  return { canvas, ctx };
+function drawImageWithQuality(ctx, img, x, y, width, height) {
+  const scale = 4; // 使用4倍大小的临时画布来进一步提高质量
+  const tempCanvas = document.createElement("canvas");
+  tempCanvas.width = width * scale;
+  tempCanvas.height = height * scale;
+  const tempCtx = tempCanvas.getContext("2d", { alpha: true });
+
+  tempCtx.imageSmoothingEnabled = true;
+  tempCtx.imageSmoothingQuality = "high";
+
+  // 在临时画布上绘制放大的图像
+  tempCtx.drawImage(
+    img,
+    0,
+    0,
+    img.naturalWidth,
+    img.naturalHeight,
+    0,
+    0,
+    tempCanvas.width,
+    tempCanvas.height
+  );
+
+  // 将临时画布的内容绘制到主画布上
+  ctx.drawImage(
+    tempCanvas,
+    0,
+    0,
+    tempCanvas.width,
+    tempCanvas.height,
+    x,
+    y,
+    width,
+    height
+  );
 }
